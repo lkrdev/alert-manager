@@ -2,7 +2,11 @@ import { Grid } from '@looker/components';
 import React from 'react';
 import useSWR from 'swr';
 import useSdk from '../../../hooks/useSdk';
-import { IDynamicField, QueryFields } from '../../../utils/queryFields';
+import {
+    IDynamicField,
+    ILookmlModelExploreFieldWithKind,
+    QueryFields,
+} from '../../../utils/queryFields';
 
 interface FieldGridProps {
     slug?: string;

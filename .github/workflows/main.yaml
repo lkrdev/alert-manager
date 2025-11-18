@@ -7,7 +7,7 @@ on:
 
 env:
   REGION: us-central1
-  APP_NAME: system-activity-advanced-reporting
+  APP_NAME: alert-manager
   BUCKET_NAME: ${{ secrets.CDN_BUCKET_NAME }}
 
 jobs:
