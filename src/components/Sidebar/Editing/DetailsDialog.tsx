@@ -23,8 +23,8 @@ import useSdk from '../../../hooks/useSdk';
 import { IAlertAndDetail } from '../../../types';
 import { getAlertTitle } from '../../../utils/alertTitle';
 import LoadingButton from '../../LoadingButton';
+import CronSelector from './CronSelector';
 import EmbedQuery from './EmbedQuery';
-import FieldGrid from './FieldGrid';
 
 interface DetailsDialogProps {
     alert_detail: IAlertAndDetail;
@@ -148,20 +148,10 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                                     onChange={formik.handleChange}
                                 />
                             </WithErrors>
-                            <FieldGrid
-                                slug={alert_detail.details.query_slug}
-                                alert_field={formik.values.field || undefined}
-                                onChange={(value) => {
-                                    formik.setFieldValue('field', value);
-                                }}
-                            />
                             <WithErrors error={formik.errors.cron}>
-                                <FieldText
-                                    label='Cron'
-                                    placeholder='Cron'
-                                    name='cron'
-                                    value={alert.cron || undefined}
-                                    onChange={formik.handleChange}
+                                <CronSelector
+                                    value={formik.values.cron}
+                                    onChange={(value) => formik.setFieldValue('cron', value)}
                                 />
                             </WithErrors>
                             {is_email && (
