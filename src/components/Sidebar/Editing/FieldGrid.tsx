@@ -1,26 +1,30 @@
-import { Grid } from '@looker/components';
+import { FieldSelect, Grid, SelectOptionObject } from '@looker/components';
+import { IAlertField } from '@looker/sdk';
 import React from 'react';
 import useSWR from 'swr';
 import useSdk from '../../../hooks/useSdk';
+
+import { map } from 'lodash';
 import {
-    IDynamicField,
-    ILookmlModelExploreFieldWithKind,
+    alertFieldToFieldOption,
+    fieldOptionValueToAlertField,
     QueryFields,
 } from '../../../utils/queryFields';
 
 interface FieldGridProps {
     slug?: string;
-    value: string | undefined;
-    onChange: (
-        value: string[] | undefined,
-        fields: (ILookmlModelExploreFieldWithKind | IDynamicField)[]
-    ) => void;
+    alert_field: IAlertField | undefined;
+    onChange: (value: IAlertField) => void;
 }
 
-const FieldGrid: React.FC<FieldGridProps> = ({ slug }) => {
+const FieldGrid: React.FC<FieldGridProps> = ({
+    slug,
+    alert_field,
+    onChange,
+}) => {
     const sdk = useSdk();
     const query = useSWR(slug ? `query-${slug}` : null, () =>
-        sdk.ok(sdk.query(slug!))
+        sdk.ok(sdk.query(slug!)),
     );
     const modelexplore = {
         model: query.data?.model,
@@ -35,8 +39,8 @@ const FieldGrid: React.FC<FieldGridProps> = ({ slug }) => {
                 sdk.lookml_model_explore({
                     lookml_model_name: modelexplore.model!,
                     explore_name: modelexplore.explore!,
-                })
-            )
+                }),
+            ),
     );
 
     const query_fields =
@@ -46,15 +50,52 @@ const FieldGrid: React.FC<FieldGridProps> = ({ slug }) => {
 
     const pivot_values = useSWR(
         query_fields ? `pivot-values-${slug}` : null,
-        () =>
-            query_fields?.pivotValues(sdk).then((values) => {
-                console.log('pivot_values', values);
-                return values;
-            })
+        () => query_fields?.getQueryPivotFieldOptions(sdk),
+    );
+
+    if (!alert_field || !pivot_values.data || !alert_field) return null;
+    console.log(pivot_values.data?.field_options);
+    console.log(
+        map(pivot_values.data?.field_options, (option) => {
+            const current_option = alertFieldToFieldOption(alert_field!);
+            return {
+                label:
+                    Array.from({ length: option.level + 1 }).join(' ') +
+                    ' ' +
+                    (option.value === current_option.value
+                        ? option.display
+                        : option.label),
+                value: option.value,
+            } as SelectOptionObject;
+        }),
     );
     return (
-        <Grid columns={3} gap="small">
-            FieldGrid
+        <Grid columns={3} gap='small'>
+            <FieldSelect
+                options={
+                    pivot_values.data && pivot_values.data.field_options
+                        ? pivot_values.data.field_options.map(
+                              (option) =>
+                                  ({
+                                      label:
+                                          Array.from({
+                                              length: option.level + 1,
+                                          }).join(' ') +
+                                          (option.value ===
+                                          alertFieldToFieldOption(alert_field)
+                                              .value
+                                              ? option.display
+                                              : option.label),
+                                      value: option.value,
+                                  } as SelectOptionObject),
+                          )
+                        : []
+                }
+                value={alertFieldToFieldOption(alert_field).value}
+                onChange={(value) =>
+                    onChange(fieldOptionValueToAlertField(value))
+                }
+            />
         </Grid>
     );
 };

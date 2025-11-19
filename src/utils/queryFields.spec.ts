@@ -1,4 +1,10 @@
-import { getPivotValues, parseDynamicFields } from './queryFields';
+import { SelectOptionProps } from '@looker/components';
+import {
+    getFieldOption,
+    getFieldOptions,
+    getPivotValues,
+    parseDynamicFields,
+} from './queryFields';
 
 describe('QueryFields', () => {
     const DF_STRING =
@@ -46,7 +52,7 @@ describe('getPivotValues', () => {
         const pivot_values = getPivotValues(
             RESULTS_JSON_MULTIPLE_PIVOTS,
             QUERY_MULTIPLE_PIVOTS.fields,
-            QUERY_MULTIPLE_PIVOTS.pivots
+            QUERY_MULTIPLE_PIVOTS.pivots,
         );
         const expected = [
             ['Cancelled', ''],
@@ -82,7 +88,7 @@ describe('getPivotValues', () => {
         ];
         for (const i of expected) {
             expect(pivot_values.map((k) => k.join('::'))).toContain(
-                i.join('::')
+                i.join('::'),
             );
         }
         for (const i of pivot_values) {
@@ -93,7 +99,7 @@ describe('getPivotValues', () => {
         const pivot_values = getPivotValues(
             RESULTS_JSON_SINGLE_PIVOT,
             QUERY_SINGLE_PIVOTS.fields,
-            QUERY_SINGLE_PIVOTS.pivots
+            QUERY_SINGLE_PIVOTS.pivots,
         );
         const expected = [
             ['Cancelled'],
@@ -104,7 +110,7 @@ describe('getPivotValues', () => {
         ];
         for (const i of expected) {
             expect(pivot_values.map((k) => k.join('::'))).toContain(
-                i.join('::')
+                i.join('::'),
             );
         }
         for (const i of pivot_values) {
@@ -1431,3 +1437,329 @@ const RESULTS_JSON_SINGLE_PIVOT = [
         },
     },
 ];
+
+const SINGLE_PIVOT_FIELD_INPUT = {
+    pivot_values: [
+        ['Cancelled'],
+        ['Complete'],
+        ['Processing'],
+        ['Returned'],
+        ['Shipped'],
+    ],
+    non_pivot_fields: [
+        {
+            align: 'right',
+            can_filter: true,
+            category: 'measure',
+            default_filter_value: null,
+            description: '',
+            enumerations: null,
+            field_group_label: null,
+            fill_style: null,
+            fiscal_month_offset: 0,
+            has_allowed_values: false,
+            hidden: false,
+            is_filter: false,
+            is_numeric: true,
+            label: 'Order Items Big Count',
+            label_from_parameter: null,
+            label_short: 'Count',
+            map_layer: null,
+            name: 'order_items_big.count',
+            strict_value_format: false,
+            requires_refresh_on_sort: false,
+            sortable: true,
+            suggestions: null,
+            synonyms: [],
+            tags: [],
+            type: 'count',
+            user_attribute_filter_types: ['number', 'advanced_filter_number'],
+            value_format: null,
+            value_format_name: null,
+            view: 'order_items_big',
+            view_label: 'Order Items Big',
+            dynamic: false,
+            week_start_day: 'monday',
+            original_view: 'order_items_big',
+            dimension_group: null,
+            error: null,
+            field_group_variant: 'Count',
+            measure: true,
+            parameter: false,
+            primary_key: false,
+            project_name: 'az_load_test',
+            scope: 'order_items_big',
+            suggest_dimension: 'order_items_big.count',
+            suggest_explore: 'order_items_big',
+            suggestable: false,
+            lookml_expression: null,
+            is_fiscal: false,
+            is_timeframe: false,
+            can_time_filter: false,
+            time_interval: null,
+            lookml_link:
+                '/projects/az_load_test/files/models%2Faz_load_test.model.lkml?line=147',
+            period_over_period_params: null,
+            permanent: null,
+            source_file: 'models/az_load_test.model.lkml',
+            source_file_path: 'az_load_test/models/az_load_test.model.lkml',
+            sql: null,
+            sql_case: null,
+            filters: null,
+            times_used: 21853638,
+            _kind_hint: 'measure',
+            _type_hint: 'number',
+        },
+        {
+            dimension: 'status_custom_field',
+            label: 'status_custom_field',
+            category: 'dimension',
+            _kind_hint: 'dimension',
+            _type_hint: 'string',
+        },
+        {
+            measure: 'count_of_user_id',
+            label: 'Count of User ID',
+            _kind_hint: 'measure',
+            _type_hint: 'number',
+        },
+    ],
+    pivot_fields: [
+        {
+            align: 'left',
+            can_filter: true,
+            category: 'dimension',
+            default_filter_value: null,
+            description: '',
+            enumerations: null,
+            field_group_label: null,
+            fill_style: null,
+            fiscal_month_offset: 0,
+            has_allowed_values: false,
+            hidden: false,
+            is_filter: false,
+            is_numeric: false,
+            label: 'Order Items Big Status',
+            label_from_parameter: null,
+            label_short: 'Status',
+            map_layer: null,
+            name: 'order_items_big.status',
+            strict_value_format: false,
+            requires_refresh_on_sort: false,
+            sortable: true,
+            suggestions: null,
+            synonyms: [],
+            tags: [],
+            type: 'string',
+            user_attribute_filter_types: ['string', 'advanced_filter_string'],
+            value_format: null,
+            value_format_name: null,
+            view: 'order_items_big',
+            view_label: 'Order Items Big',
+            dynamic: false,
+            week_start_day: 'monday',
+            original_view: 'order_items_big',
+            dimension_group: null,
+            error: null,
+            field_group_variant: 'Status',
+            measure: false,
+            parameter: false,
+            primary_key: false,
+            project_name: 'az_load_test',
+            scope: 'order_items_big',
+            suggest_dimension: 'order_items_big.status',
+            suggest_explore: 'order_items_big',
+            suggestable: true,
+            lookml_expression: null,
+            is_fiscal: false,
+            is_timeframe: false,
+            can_time_filter: false,
+            time_interval: null,
+            lookml_link:
+                '/projects/az_load_test/files/models%2Faz_load_test.model.lkml?line=131',
+            period_over_period_params: null,
+            permanent: null,
+            source_file: 'models/az_load_test.model.lkml',
+            source_file_path: 'az_load_test/models/az_load_test.model.lkml',
+            sql: '${TABLE}.status ',
+            sql_case: null,
+            filters: null,
+            times_used: 21888039,
+            _kind_hint: 'dimension',
+            _type_hint: 'string',
+        },
+    ],
+    measure_fields: [
+        {
+            align: 'right',
+            can_filter: true,
+            category: 'measure',
+            default_filter_value: null,
+            description: '',
+            enumerations: null,
+            field_group_label: null,
+            fill_style: null,
+            fiscal_month_offset: 0,
+            has_allowed_values: false,
+            hidden: false,
+            is_filter: false,
+            is_numeric: true,
+            label: 'Order Items Big Count',
+            label_from_parameter: null,
+            label_short: 'Count',
+            map_layer: null,
+            name: 'order_items_big.count',
+            strict_value_format: false,
+            requires_refresh_on_sort: false,
+            sortable: true,
+            suggestions: null,
+            synonyms: [],
+            tags: [],
+            type: 'count',
+            user_attribute_filter_types: ['number', 'advanced_filter_number'],
+            value_format: null,
+            value_format_name: null,
+            view: 'order_items_big',
+            view_label: 'Order Items Big',
+            dynamic: false,
+            week_start_day: 'monday',
+            original_view: 'order_items_big',
+            dimension_group: null,
+            error: null,
+            field_group_variant: 'Count',
+            measure: true,
+            parameter: false,
+            primary_key: false,
+            project_name: 'az_load_test',
+            scope: 'order_items_big',
+            suggest_dimension: 'order_items_big.count',
+            suggest_explore: 'order_items_big',
+            suggestable: false,
+            lookml_expression: null,
+            is_fiscal: false,
+            is_timeframe: false,
+            can_time_filter: false,
+            time_interval: null,
+            lookml_link:
+                '/projects/az_load_test/files/models%2Faz_load_test.model.lkml?line=147',
+            period_over_period_params: null,
+            permanent: null,
+            source_file: 'models/az_load_test.model.lkml',
+            source_file_path: 'az_load_test/models/az_load_test.model.lkml',
+            sql: null,
+            sql_case: null,
+            filters: null,
+            times_used: 21853638,
+            _kind_hint: 'measure',
+            _type_hint: 'number',
+        },
+        {
+            measure: 'count_of_user_id',
+            label: 'Count of User ID',
+            _kind_hint: 'measure',
+            _type_hint: 'number',
+        },
+    ],
+};
+
+describe('getFieldOption', () => {
+    it('should return the correct field option', () => {
+        const field_option = getFieldOption(
+            { title: 'Order Items Big', name: 'order_items_big.count' },
+            undefined,
+        );
+        expect(field_option).toEqual({
+            label: 'Order Items Big',
+            value: 'order_items_big.count',
+            display: 'Order Items Big',
+            level: 0,
+        });
+        const field_option_with_pivot = getFieldOption(
+            { title: 'Order Items Big', name: 'order_items_big.count' },
+            ['Cancelled'],
+        );
+        expect(field_option_with_pivot).toEqual({
+            label: 'Order Items Big (any)',
+            value: 'order_items_big.count::Cancelled',
+            display: 'Any Order Items Big',
+            level: 1,
+        });
+        const option_with_multiple_pivots = getFieldOption(
+            { title: 'Order Items Big', name: 'order_items_big.count' },
+            ['Cancelled', 'Complete'],
+        );
+        expect(option_with_multiple_pivots).toEqual({
+            label: 'Order Items Big (any)',
+            value: 'order_items_big.count::Cancelled::Complete',
+            display: 'Any Order Items Big',
+            level: 2,
+        });
+    });
+});
+
+describe('getFieldOptions', () => {
+    it('should return the correct field options with single pivot', () => {
+        const field_options = getFieldOptions(
+            SINGLE_PIVOT_FIELD_INPUT.pivot_values,
+            SINGLE_PIVOT_FIELD_INPUT.measure_fields as any,
+        );
+        const EXPECTED = [
+            getFieldOption(
+                { title: 'Order Items Big', name: 'order_items_big.count' },
+                undefined,
+            ),
+            getFieldOption(
+                {
+                    title: 'Cancelled',
+                    name: 'order_items_big.count::Cancelled',
+                },
+                ['Cancelled'],
+            ),
+
+            getFieldOption(
+                { title: 'Complete', name: 'order_items_big.count::Complete' },
+                ['Complete'],
+            ),
+            getFieldOption(
+                {
+                    title: 'Processing',
+                    name: 'order_items_big.count::Processing',
+                },
+                ['Processing'],
+            ),
+            getFieldOption(
+                { title: 'Returned', name: 'order_items_big.count::Returned' },
+                ['Returned'],
+            ),
+            getFieldOption(
+                { title: 'Shipped', name: 'order_items_big.count::Shipped' },
+                ['Shipped'],
+            ),
+            getFieldOption(
+                { title: 'Count of User ID', name: 'count_of_user_id' },
+                undefined,
+            ),
+            getFieldOption(
+                { title: 'Cancelled', name: 'count_of_user_id::Cancelled' },
+                ['Cancelled'],
+            ),
+            getFieldOption(
+                { title: 'Complete', name: 'count_of_user_id::Complete' },
+                ['Complete'],
+            ),
+            getFieldOption(
+                { title: 'Processing', name: 'count_of_user_id::Processing' },
+                ['Processing'],
+            ),
+            getFieldOption(
+                { title: 'Returned', name: 'count_of_user_id::Returned' },
+                ['Returned'],
+            ),
+            getFieldOption(
+                { title: 'Shipped', name: 'count_of_user_id::Shipped' },
+                ['Shipped'],
+            ),
+        ] as (SelectOptionProps & { level: number; display: string })[];
+        expect(field_options).toEqual(EXPECTED);
+    });
+});

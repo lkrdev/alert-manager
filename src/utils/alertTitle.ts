@@ -26,7 +26,13 @@ export const getOperator = (operator: ComparisonType): string => {
     return base_operator[operator] || date_operator[operator] || '';
 };
 
-export const getAlertTitle = (alert: IAlert, custom_title?: string) => {
+export const getAlertTitle = (
+    alert: Pick<
+        IAlert,
+        'custom_title' | 'comparison_type' | 'threshold' | 'field'
+    >,
+    custom_title?: string,
+) => {
     if (custom_title?.length) {
         return custom_title;
     } else if (alert.custom_title?.length) {

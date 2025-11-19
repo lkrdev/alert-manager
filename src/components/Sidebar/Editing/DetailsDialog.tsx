@@ -3,9 +3,7 @@ import {
     ButtonTransparent,
     Dialog,
     FieldChips,
-    FieldSelect,
     FieldText,
-    Grid,
     Header,
     Paragraph,
     Space,
@@ -15,6 +13,7 @@ import {
     ComparisonType,
     DestinationType,
     IAlertDestination,
+    IAlertField,
 } from '@looker/sdk';
 import { useFormik } from 'formik';
 import { map, omit, some } from 'lodash';
@@ -25,6 +24,7 @@ import { IAlertAndDetail } from '../../../types';
 import { getAlertTitle } from '../../../utils/alertTitle';
 import LoadingButton from '../../LoadingButton';
 import EmbedQuery from './EmbedQuery';
+import FieldGrid from './FieldGrid';
 
 interface DetailsDialogProps {
     alert_detail: IAlertAndDetail;
@@ -36,6 +36,7 @@ interface DetailsFormValues {
     destinations: IAlertDestination[];
     threshold: number | undefined;
     comparison_type: ComparisonType | undefined;
+    field: IAlertField | undefined;
 }
 
 const WithErrors = ({
@@ -46,12 +47,12 @@ const WithErrors = ({
     error: string | undefined;
 }) => {
     return (
-        <SpaceVertical gap="none">
+        <SpaceVertical gap='none'>
             {children}
             <Paragraph
-                fontSize="xxsmall"
-                color="critical"
-                m="none"
+                fontSize='xxsmall'
+                color='critical'
+                m='none'
                 style={{ visibility: error?.length ? 'visible' : 'hidden' }}
             >
                 {error}
@@ -62,6 +63,7 @@ const WithErrors = ({
 
 const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
     const { alert } = alert_detail;
+    console.log({ alert_detail });
     const open = useBoolean(true);
     const saving = useBoolean(false);
     const sdk = useSdk();
@@ -95,13 +97,13 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                         (dest) =>
                             dest.destination_type === DestinationType.EMAIL &&
                             dest.email_address &&
-                            !emailRegex.test(dest.email_address)
+                            !emailRegex.test(dest.email_address),
                     )
                     .map((dest) => dest.email_address);
 
                 if (invalidEmails.length > 0) {
                     errors.destinations = `Invalid email addresses: ${invalidEmails.join(
-                        ', '
+                        ', ',
                     )}`;
                 }
             }
@@ -118,7 +120,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
 
     const is_email = some(
         alert.destinations,
-        (destination) => destination.destination_type === DestinationType.EMAIL
+        (destination) => destination.destination_type === DestinationType.EMAIL,
     );
 
     return (
@@ -127,52 +129,37 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                 key={open.value ? 'open' : 'closed'}
                 isOpen={open.value}
                 onClose={() => open.setFalse()}
-                width="80vw"
+                width='80vw'
                 content={
-                    <SpaceVertical gap="medium" between p="large">
-                        <Header as="h3" m="none">
+                    <SpaceVertical gap='medium' between p='large'>
+                        <Header as='h3' m='none'>
                             Alert Details
                         </Header>
                         <EmbedQuery slug={alert_detail.details.query_slug} />
                         <SpaceVertical>
                             <WithErrors error={formik.errors.custom_title}>
                                 <FieldText
-                                    label="Title"
+                                    label='Title'
                                     placeholder={getAlertTitle(
-                                        omit(alert, 'custom_title')
+                                        omit(alert, 'custom_title'),
                                     )}
-                                    name="custom_title"
+                                    name='custom_title'
                                     value={alert.custom_title || undefined}
                                     onChange={formik.handleChange}
                                 />
                             </WithErrors>
-                            <Grid columns={3} gap="small">
-                                <FieldSelect
-                                    label="Field"
-                                    name="field"
-                                    options={pivot_values.map((field) => ({
-                                        label: field.label,
-                                        value: field.name,
-                                    }))}
-                                    value={formik.values.field || undefined}
-                                    onChange={formik.handleChange}
-                                >
-                                    <option value="1">1</option>
-                                </FieldSelect>
-                                <FieldText
-                                    label="Threshold"
-                                    name="threshold"
-                                    type="number"
-                                    placeholder="Threshold"
-                                    value={formik.values.threshold || undefined}
-                                    onChange={formik.handleChange}
-                                />
-                            </Grid>
+                            <FieldGrid
+                                slug={alert_detail.details.query_slug}
+                                alert_field={formik.values.field || undefined}
+                                onChange={(value) => {
+                                    formik.setFieldValue('field', value);
+                                }}
+                            />
                             <WithErrors error={formik.errors.cron}>
                                 <FieldText
-                                    label="Cron"
-                                    placeholder="Cron"
-                                    name="cron"
+                                    label='Cron'
+                                    placeholder='Cron'
+                                    name='cron'
                                     value={alert.cron || undefined}
                                     onChange={formik.handleChange}
                                 />
@@ -186,12 +173,12 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                                     }
                                 >
                                     <FieldChips
-                                        label="Emails"
-                                        placeholder="Emails"
-                                        name="email"
+                                        label='Emails'
+                                        placeholder='Emails'
+                                        name='email'
                                         values={map(
                                             formik.values.destinations,
-                                            (v) => v?.email_address || ''
+                                            (v) => v?.email_address || '',
                                         )}
                                         onChange={(values) => {
                                             formik.setFieldValue(
@@ -200,14 +187,14 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                                                     email_address: v,
                                                     destination_type:
                                                         DestinationType.EMAIL,
-                                                }))
+                                                })),
                                             );
                                         }}
                                     />
                                 </WithErrors>
                             )}
                         </SpaceVertical>
-                        <Space justify="end">
+                        <Space justify='end'>
                             <ButtonTransparent onClick={open.setFalse}>
                                 Cancel
                             </ButtonTransparent>
@@ -223,7 +210,7 @@ const DetailsDialog: React.FC<DetailsDialogProps> = ({ alert_detail }) => {
                 }
             ></Dialog>
             <Button
-                size="small"
+                size='small'
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
