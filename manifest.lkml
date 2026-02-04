@@ -12,8 +12,7 @@ application: alert_manager {
       "unfollow_alert", 
       "all_integrations", 
       "query", 
-      "lookml_model_explore",
-      "query"
+      "lookml_model_explore"
     ]
     navigation: yes
     new_window: yes
